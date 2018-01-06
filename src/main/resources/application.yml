@@ -13,9 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+server:
+  port: ${SERVER_PORT}
 repo:
-  home: oak
+  home: ${REPO_HOME}
 oak:
   mongo:
-    db: oak
-    uri: mongodb://localhost:27017
+    db: ${DB_NAME}
+    uri: mongodb://${MONGO_HOST}:${MONGO_PORT}

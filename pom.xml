@@ -1,16 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
-	license agreements. See the NOTICE file distributed with this work for additional 
-	information regarding copyright ownership. The ASF licenses this file to 
-	You under the Apache License, Version 2.0 (the "License"); you may not use 
-	this file except in compliance with the License. You may obtain a copy of 
-	the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required 
-	by applicable law or agreed to in writing, software distributed under the 
-	License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
-	OF ANY KIND, either express or implied. See the License for the specific 
-	language governing permissions and limitations under the License. -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
@@ -19,45 +7,68 @@
 	<!-- P R O J E C T D E S C R I P T I O N -->
 	<!-- ====================================================================== -->
 	<parent>
-		<groupId>org.apache.jackrabbit</groupId>
-		<artifactId>oak-parent</artifactId>
-		<version>1.7.11</version>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.3.0.RELEASE</version>
 	</parent>
-	<artifactId>jcrservice</artifactId>
+	<groupId>com.synectiks.portal</groupId>
+	<artifactId>oak.service</artifactId>
+	<version>1.0.0</version>
 
 	<name>Oak Standalone Example</name>
 	<description>Standalone application based on Spring Boot then embeds a Jackrabbit Oak content repository</description>
 
 	<properties>
-		<skip.deployment>true</skip.deployment>
-		<slf4j.version>1.7.21</slf4j.version>
-		<slf4j.api.version>1.7.21</slf4j.api.version>
-		<spring.boot.version>1.5.7.RELEASE</spring.boot.version>
+		<mongo.driver.version>3.4.3</mongo.driver.version>
+		<oak.version>1.6.0</oak.version>
+		<tika.version>1.7</tika.version>
+		<spring.boot.version>1.3.0.RELEASE</spring.boot.version>
+		<jackrabbit.version>2.14.0</jackrabbit.version>
+		<lucene.version>4.7.1</lucene.version>
+
+
+		<test.opts.memory>-Xmx512m -XX:MaxPermSize=64m</test.opts.memory>
+		<test.opts>${test.opts.coverage} ${test.opts.memory}
+			-XX:+HeapDumpOnOutOfMemoryError -Dupdate.limit=100
+			-Djava.awt.headless=true</test.opts>
+		<skip.deployment>false</skip.deployment>
+		<skip.coverage>true</skip.coverage>
+		<known.issues />
+		<project.reporting.outputEncoding>
+			${project.build.sourceEncoding}
+		</project.reporting.outputEncoding>
+		<jackrabbit.version>2.14.0</jackrabbit.version>
+		<mongo.host>127.0.0.1</mongo.host>
+		<mongo.port>27017</mongo.port>
+		<mongo.db>MongoMKDB</mongo.db>
+		<mongo.db2>MongoMKDB2</mongo.db2>
+		<segment.db>SegmentMK</segment.db>
+		<!-- Note that we're using SLF4J API version 1.7 when compiling -->
+		<!-- core Oak components but more recent SLF4J and Logback versions -->
+		<!-- when compiling and running test cases and the oak-run jar. -->
+		<!-- This way it's possible to use Oak also in environments that -->
+		<!-- only provide SLF4J version 1.7, while still using a more -->
+		<!-- recent version (if required) when we are in control the runtime environment. -->
+		<slf4j.api.version>1.7.6</slf4j.api.version>
+		<slf4j.version>1.7.6</slf4j.version> <!-- sync with logback version -->
+		<logback.version>1.1.6</logback.version>
+		<h2.version>1.4.193</h2.version>
+		<findbugs.version>3.0.0</findbugs.version>
+		<derby.version>10.12.1.1</derby.version>
+		<java.version>1.8</java.version>
+
+		<!-- specifies on which fixture to run the integration testing tests. override 
+			in profiles or provide from command line to change behaviour. Provide more 
+			fixtures space separated. See org.apache.jackrabbit.oak.jcr.FixturesHelper#AVAILABLE_FIXTURES 
+			for the possible values: SEGMENT_MK SEGMENT_TAR DOCUMENT_NS DOCUMENT_RDB -->
+		<fixtures>SEGMENT_TAR</fixtures>
+
+		<!-- whether skip the surefire unit testing during the integration testing. 
+			Override with -Dsurefire.skip.ut=true when needed -->
+		<surefire.skip.ut>false</surefire.skip.ut>
 	</properties>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-dependencies</artifactId>
-				<version>${spring.boot.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-
 	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-tomcat</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jetty</artifactId>
@@ -68,11 +79,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
@@ -80,6 +86,17 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.scr.annotations</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.connect</artifactId>
+			<version>0.1.0</version>
 		</dependency>
 
 		<!-- For colored console logging -->
@@ -97,14 +114,12 @@
 		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongo-java-driver</artifactId>
-			<version>${mongo.driver.version}</version>
 			<optional>true</optional>
 		</dependency>
 		<!-- Required for the persistent cache -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<version>${h2.version}</version>
 			<optional>true</optional>
 		</dependency>
 
@@ -126,16 +141,7 @@
 					<groupId>commons-logging</groupId>
 					<artifactId>commons-logging</artifactId>
 				</exclusion>
-				<exclusion>
-					<groupId>org.apache.httpcomponents</groupId>
-					<artifactId>httpcore</artifactId>
-				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.jackrabbit</groupId>
-			<artifactId>oak-pojosr</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.jackrabbit</groupId>
@@ -155,17 +161,17 @@
 		<dependency>
 			<groupId>org.apache.jackrabbit</groupId>
 			<artifactId>oak-jcr</artifactId>
-			<version>${project.version}</version>
+			<version>${oak.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.jackrabbit</groupId>
+			<artifactId>oak-pojosr</artifactId>
+			<version>${oak.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.jackrabbit</groupId>
 			<artifactId>oak-lucene</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.jackrabbit</groupId>
-			<artifactId>oak-store-composite</artifactId>
-			<version>${project.version}</version>
+			<version>${oak.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.googlecode.json-simple</groupId>
@@ -174,12 +180,6 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>1.1.7</version>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-core</artifactId>
-			<version>1.1.7</version>
 		</dependency>
 
 		<!-- Required for Felix WebConsole -->
@@ -253,6 +253,21 @@
 			<groupId>com.synectiks</groupId>
 			<artifactId>common-libraries</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.data</groupId>
+					<artifactId>spring-data-elasticsearch</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.amazonaws</groupId>
+					<artifactId>aws-java-sdk-dynamodb</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache</groupId>
+			<artifactId>jackrabbit-ocm</artifactId>
+			<version>2.0.0</version>
 		</dependency>
 	</dependencies>
 
@@ -261,7 +276,6 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>${spring.boot.version}</version>
 				<executions>
 					<execution>
 						<goals>
@@ -297,7 +311,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
-				<version>2.18.1</version>
 				<configuration>
 					<systemPropertyVariables>
 						<java.util.logging.config.file>
@@ -322,7 +335,352 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<!-- Parent plugins -->
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>pre-unit-test</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+						<configuration>
+							<skip>${skip.coverage}</skip>
+							<destFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</destFile>
+							<propertyName>test.opts.coverage</propertyName>
+						</configuration>
+					</execution>
+					<execution>
+						<id>post-unit-test</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<configuration>
+							<skip>${skip.coverage}</skip>
+							<dataFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</dataFile>
+							<outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+						<configuration>
+							<excludes>
+								<exclude>logback-test.xml</exclude>
+							</excludes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<target>${java.version}</target>
+						<source>${java.version}</source>
+					</configuration>
+				</plugin>
+				<plugin>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<configuration>
+						<source>${java.version}</source>
+						<aggregate>true</aggregate>
+						<links>
+							<link>http://docs.oracle.com/javase/7/docs/api/</link>
+							<link>https://docs.adobe.com/docs/en/spec/javax.jcr/javadocs/jcr-2.0/</link>
+							<link>http://jackrabbit.apache.org/api/2.14/</link>
+						</links>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.felix</groupId>
+					<artifactId>maven-bundle-plugin</artifactId>
+					<version>3.0.0</version>
+					<extensions>true</extensions>
+					<inherited>true</inherited>
+					<configuration>
+						<obrRepository>NONE</obrRepository>
+						<instructions>
+							<Bundle-Category>oak</Bundle-Category>
+							<Bundle-DocURL>
+								http://jackrabbit.apache.org/oak/
+							</Bundle-DocURL>
+							<Bundle-Vendor>The Apache Software Foundation</Bundle-Vendor>
+							<!-- Don't default to bundle version for packages without explicit 
+								export version. See FELIX-5172 -->
+							<_nodefaultversion>true</_nodefaultversion>
+						</instructions>
+					</configuration>
+					<!-- OAK-3041: use updated Bnd -->
+					<dependencies>
+						<dependency>
+							<groupId>biz.aQute.bnd</groupId>
+							<artifactId>bndlib</artifactId>
+							<version>2.4.0</version>
+						</dependency>
+					</dependencies>
+					<executions>
+						<execution>
+							<id>baseline</id>
+							<goals>
+								<goal>baseline</goal>
+							</goals>
+							<phase>pre-integration-test</phase>
+							<configuration>
+								<logResults>false</logResults>
+								<failOnWarning>false</failOnWarning>
+								<failOnError>true</failOnError>
+								<filters>
+									<!-- Disable baseline for explicitly NOT managed packages. See OAK-3842 -->
+									<filter>!org.apache.jackrabbit.oak.cache</filter>
+									<filter>!org.apache.jackrabbit.oak.commons</filter>
+									<filter>!org.apache.jackrabbit.oak.commons.benchmark</filter>
+									<filter>!org.apache.jackrabbit.oak.commons.cache</filter>
+									<filter>!org.apache.jackrabbit.oak.commons.concurrent</filter>
+									<filter>!org.apache.jackrabbit.oak.commons.io</filter>
+									<filter>!org.apache.jackrabbit.oak.commons.jmx</filter>
+									<filter>!org.apache.jackrabbit.oak.commons.json</filter>
+									<filter>!org.apache.jackrabbit.oak.commons.sort</filter>
+									<filter>!org.apache.jackrabbit.oak.spi.blob</filter>
+									<filter>!org.apache.jackrabbit.oak.spi.blob.split</filter>
+									<filter>!org.apache.jackrabbit.oak.spi.blob.stats</filter>
+									<filter>!org.apache.jackrabbit.oak.blob.cloud.aws.s3</filter>
+									<filter>!org.apache.jackrabbit.oak</filter>
+									<filter>!org.apache.jackrabbit.oak.json</filter>
+									<filter>!org.apache.jackrabbit.oak.management</filter>
+									<filter>!org.apache.jackrabbit.oak.namepath</filter>
+									<filter>!org.apache.jackrabbit.oak.osgi</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.atomic</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.blob</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.blob.datastore</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.commit</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.identifier</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.index</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.index.aggregate</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.index.counter</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.index.fulltext</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.index.nodetype</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.index.property</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.index.property.jmx</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.index.reference</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.itemsave</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.lock</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.memory</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.name</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.nodetype</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.nodetype.write</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.observation</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.observation.filter</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.value</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.version</filter>
+									<filter>!org.apache.jackrabbit.oak.query</filter>
+									<filter>!org.apache.jackrabbit.oak.query.fulltext</filter>
+									<filter>!org.apache.jackrabbit.oak.security</filter>
+									<filter>!org.apache.jackrabbit.oak.spi.commit</filter>
+									<filter>!org.apache.jackrabbit.oak.spi.gc</filter>
+									<filter>!org.apache.jackrabbit.oak.spi.lifecycle</filter>
+									<filter>!org.apache.jackrabbit.oak.spi.query</filter>
+									<filter>!org.apache.jackrabbit.oak.spi.state</filter>
+									<filter>!org.apache.jackrabbit.oak.spi.whiteboard</filter>
+									<filter>!org.apache.jackrabbit.oak.spi.xml</filter>
+									<filter>!org.apache.jackrabbit.oak.stats</filter>
+									<filter>!org.apache.jackrabbit.oak.util</filter>
+									<filter>!org.apache.jackrabbit.oak.jcr</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.index.lucene</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.index.lucene.util</filter>
+									<filter>!org.apache.jackrabbit.oak.security.authentication.ldap</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.backup</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.segment</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.segment.file</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.segment.http</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.index.solr</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.index.solr.configuration</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.index.solr.index</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.index.solr.query</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.index.solr.server</filter>
+									<filter>!org.apache.jackrabbit.oak.plugins.index.solr.util</filter>
+									<filter>*</filter>
+								</filters>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.felix</groupId>
+					<artifactId>maven-scr-plugin</artifactId>
+					<version>1.16.0</version>
+					<executions>
+						<execution>
+							<id>generate-scr-scrdescriptor</id>
+							<goals>
+								<goal>scr</goal>
+							</goals>
+							<configuration>
+								<properties>
+									<service.vendor>The Apache Software Foundation</service.vendor>
+								</properties>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<configuration>
+						<skip>${skip.deployment}</skip>
+					</configuration>
+				</plugin>
+				<plugin>
+					<artifactId>maven-release-plugin</artifactId>
+					<configuration>
+						<autoVersionSubmodules>true</autoVersionSubmodules>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.rat</groupId>
+					<artifactId>apache-rat-plugin</artifactId>
+					<version>0.11</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<configuration>
+						<argLine>${test.opts}</argLine>
+						<systemPropertyVariables>
+							<known.issues>${known.issues}</known.issues>
+							<mongo.host>${mongo.host}</mongo.host>
+							<mongo.port>${mongo.port}</mongo.port>
+							<mongo.db>${mongo.db}</mongo.db>
+							<mongo.db2>${mongo.db2}</mongo.db2>
+							<mongo.url>${mongo.url}</mongo.url>
+							<segment.db>${segment.db}</segment.db>
+							<nsfixtures>${fixtures}</nsfixtures>
+							<derby.stream.error.file>${project.build.directory}/derby.log</derby.stream.error.file>
+						</systemPropertyVariables>
+						<redirectTestOutputToFile>true</redirectTestOutputToFile>
+					</configuration>
+				</plugin>
+				<plugin>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<configuration>
+						<argLine>${test.opts}</argLine>
+						<systemPropertyVariables>
+							<known.issues>${known.issues}</known.issues>
+							<mongo.host>${mongo.host}</mongo.host>
+							<mongo.port>${mongo.port}</mongo.port>
+							<mongo.db>${mongo.db}</mongo.db>
+							<mongo.db2>${mongo.db2}</mongo.db2>
+							<nsfixtures>${fixtures}</nsfixtures>
+							<derby.stream.error.file>${project.build.directory}/derby.log</derby.stream.error.file>
+						</systemPropertyVariables>
+					</configuration>
+				</plugin>
+				<plugin>
+					<artifactId>maven-checkstyle-plugin</artifactId>
+					<version>2.11</version>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>findbugs-maven-plugin</artifactId>
+					<version>${findbugs.version}</version>
+				</plugin>
+				<!-- This plugin's configuration is used to store Eclipse m2e -->
+				<!-- settings only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.felix</groupId>
+										<artifactId>maven-scr-plugin</artifactId>
+										<versionRange>[1.7.4,)</versionRange>
+										<goals>
+											<goal>scr</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute />
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.codehaus.mojo</groupId>
+										<artifactId>build-helper-maven-plugin</artifactId>
+										<versionRange>[1.7,)</versionRange>
+										<goals>
+											<goal>reserve-network-port</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute />
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.jacoco</groupId>
+										<artifactId>jacoco-maven-plugin</artifactId>
+										<versionRange>[0.7.1.201405082137,)</versionRange>
+										<goals>
+											<goal>prepare-agent</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-site-plugin</artifactId>
+					<version>3.3</version>
+					<configuration>
+						<generateReports>false</generateReports>
+						<skip>true</skip>
+						<skipDeploy>true</skipDeploy>
+					</configuration>
+					<dependencies>
+						<dependency>
+							<groupId>org.apache.maven.doxia</groupId>
+							<artifactId>doxia-module-markdown</artifactId>
+							<version>1.5</version>
+						</dependency>
+					</dependencies>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-scm-publish-plugin</artifactId>
+					<version>1.0-beta-2</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-project-info-reports-plugin</artifactId>
+					<version>2.4</version>
+				</plugin>
+				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>0.7.1.201405082137</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 
 	<profiles>
@@ -352,4 +710,122 @@
 		</profile>
 	</profiles>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>${spring.boot.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.osgi</groupId>
+				<artifactId>org.osgi.core</artifactId>
+				<version>4.2.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.osgi</groupId>
+				<artifactId>org.osgi.compendium</artifactId>
+				<version>4.2.0</version>
+			</dependency>
+			<dependency>
+				<groupId>biz.aQute.bnd</groupId>
+				<artifactId>bndlib</artifactId>
+				<version>2.2.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>org.apache.felix.scr.annotations</artifactId>
+				<version>1.9.6</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.code.findbugs</groupId>
+				<artifactId>jsr305</artifactId>
+				<version>2.0.0</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.12</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mongodb</groupId>
+				<artifactId>mongo-java-driver</artifactId>
+				<version>${mongo.driver.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>15.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.easymock</groupId>
+				<artifactId>easymock</artifactId>
+				<version>3.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${slf4j.api.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-simple</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>log4j-over-slf4j</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>jcl-over-slf4j</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>jul-to-slf4j</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-classic</artifactId>
+				<version>${logback.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.jclouds.provider</groupId>
+				<artifactId>aws-s3</artifactId>
+				<version>1.7.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.sling</groupId>
+				<artifactId>org.apache.sling.testing.osgi-mock</artifactId>
+				<version>1.3.0</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>commons-lang</groupId>
+				<artifactId>commons-lang</artifactId>
+				<version>2.6</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>2.5</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-math3</artifactId>
+				<version>3.6.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.tomcat</groupId>
+				<artifactId>tomcat-jdbc</artifactId>
+				<version>7.0.72</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>

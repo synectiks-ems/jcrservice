@@ -30,72 +30,84 @@ import org.apache.jackrabbit.server.remoting.davex.JcrRemotingServlet;
 import org.apache.jackrabbit.webdav.simple.SimpleWebdavServlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.ServletRegistrationBean;
+import org.springframework.boot.context.embedded.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 /**
- * Configures the Webdav and Davex servlet to enabled remote
- * access to the repository
+ * Configures the Webdav and Davex servlet to enabled remote access to the
+ * repository
  */
 @Configuration
 public class RemotingInitializer {
 
-    @Value("${repo.home}/dav")
-    private String davHome;
+	@Value("${repo.home}/dav")
+	private String davHome;
 
-    @Autowired
-    private Repository repository;
+	@Autowired
+	private Repository repository;
 
-    @Autowired
-    private ServletContext servletContext;
+	@Autowired
+	private ServletContext servletContext;
 
-    @Bean
-    public ServletRegistrationBean webDavServlet() {
-        ServletRegistrationBean bean = new ServletRegistrationBean(new SimpleWebdavServlet() {
-            @Override
-            public Repository getRepository() {
-                return repository;
-            }
+	@Bean
+	public ServletRegistrationBean webDavServlet() {
+		ServletRegistrationBean bean = new ServletRegistrationBean(
+				new SimpleWebdavServlet() {
 
-            @Override
-            public ServletContext getServletContext() {
-                return RemotingInitializer.this.getServletContext();
-            }
-        }, "/repository/*");
+					private static final long serialVersionUID = 4121540909477413327L;
 
-        bean.addInitParameter(SimpleWebdavServlet.INIT_PARAM_RESOURCE_PATH_PREFIX, "/repository");
-        bean.addInitParameter(SimpleWebdavServlet.INIT_PARAM_RESOURCE_CONFIG, "/remoting/webdav-config.xml");
-        return bean;
-    }
+					@Override
+					public Repository getRepository() {
+						return repository;
+					}
 
-    @Bean
-    public ServletRegistrationBean remotingServlet() {
-        ServletRegistrationBean bean = new ServletRegistrationBean(new JcrRemotingServlet() {
+		            @Override
+		            public ServletContext getServletContext() {
+		                return RemotingInitializer.this.getServletContext();
+		            }
+				}, "/repository/*");
 
-            @Override
-            public Repository getRepository() {
-                return repository;
-            }
+		bean.addInitParameter(SimpleWebdavServlet.INIT_PARAM_RESOURCE_PATH_PREFIX,
+				"/repository");
+		bean.addInitParameter(SimpleWebdavServlet.INIT_PARAM_RESOURCE_CONFIG,
+				"/remoting/webdav-config.xml");
+		return bean;
+	}
 
-            @Override
-            public ServletContext getServletContext() {
-                return RemotingInitializer.this.getServletContext();
-            }
-        }, "/server/*");
+	@Bean
+	public ServletRegistrationBean remotingServlet() {
+		ServletRegistrationBean bean = new ServletRegistrationBean(
+				new JcrRemotingServlet() {
 
-        bean.addInitParameter(JcrRemotingServlet.INIT_PARAM_RESOURCE_PATH_PREFIX, "/server");
-        bean.addInitParameter(JcrRemotingServlet.INIT_PARAM_BATCHREAD_CONFIG, "/remoting/batchread.properties");
+					private static final long serialVersionUID = -8803250572300407741L;
 
-        bean.addInitParameter(JcrRemotingServlet.INIT_PARAM_PROTECTED_HANDLERS_CONFIG,
-                "/remoting/protectedHandlersConfig.xml");
-        bean.addInitParameter(JcrRemotingServlet.INIT_PARAM_HOME, davHome);
-        return bean;
-    }
+					@Override
+					public Repository getRepository() {
+						return repository;
+					}
 
-    /**
+		            @Override
+		            public ServletContext getServletContext() {
+		                return RemotingInitializer.this.getServletContext();
+		            }
+				}, "/server/*");
+
+		bean.addInitParameter(JcrRemotingServlet.INIT_PARAM_RESOURCE_PATH_PREFIX,
+				"/server");
+		bean.addInitParameter(JcrRemotingServlet.INIT_PARAM_BATCHREAD_CONFIG,
+				"/remoting/batchread.properties");
+
+		// TODO By docs this is meant to point to a file which gets loaded
+		// but servlet always reads it as File not via input stream. Hence using
+		// actual class
+		bean.addInitParameter(JcrRemotingServlet.INIT_PARAM_PROTECTED_HANDLERS_CONFIG,
+				"/remoting/protectedHandlersConfig.xml");
+		bean.addInitParameter(JcrRemotingServlet.INIT_PARAM_HOME, davHome);
+		return bean;
+	}/**
      * Creates a proxy ServletContext which delegates the resource loading to Spring Resource support
      * Without this default embedded server ServletContext based resource loading was failing
      */

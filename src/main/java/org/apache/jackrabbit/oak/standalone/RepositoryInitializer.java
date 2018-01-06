@@ -124,7 +124,7 @@ public class RepositoryInitializer {
         config.put("repo.home", repoHomeDir.getAbsolutePath());
         config.put("oak.mongo.db", mongoDbName);
         config.put("oak.mongo.uri", getMongoURI());
-
+log.info("Config: " + config);
         //Configures BundleActivator to get notified of
         //OSGi startup and shutdown
         configureActivator(config);

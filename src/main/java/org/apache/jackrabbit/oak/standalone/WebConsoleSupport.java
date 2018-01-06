@@ -76,7 +76,7 @@ public class WebConsoleSupport {
     }
 
     @Bean
-    public ServletListenerRegistrationBean felixListener() {
+    public ServletListenerRegistrationBean<ProxyListener> felixListener() {
         return new ServletListenerRegistrationBean<ProxyListener>(new ProxyListener());
     }
 

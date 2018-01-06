@@ -55,7 +55,10 @@ public class RemotingInitializer {
     @Bean
     public ServletRegistrationBean webDavServlet() {
         ServletRegistrationBean bean = new ServletRegistrationBean(new SimpleWebdavServlet() {
-            @Override
+
+			private static final long serialVersionUID = 4410411295230555384L;
+
+			@Override
             public Repository getRepository() {
                 return repository;
             }
@@ -75,7 +78,9 @@ public class RemotingInitializer {
     public ServletRegistrationBean remotingServlet() {
         ServletRegistrationBean bean = new ServletRegistrationBean(new JcrRemotingServlet() {
 
-            @Override
+			private static final long serialVersionUID = 1L;
+
+			@Override
             public Repository getRepository() {
                 return repository;
             }

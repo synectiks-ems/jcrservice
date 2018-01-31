@@ -29,88 +29,88 @@ Once done you can run the application by executing
 
 Api to get the list of child nodes by absolute node path.
 
-**Method:** POST
-**Params:**
-	**path**	String 	absolute node path
-**Response:**
-	{}		Json string of child node objects
+	Method: POST
+	Params:
+		path*	String 	absolute node path
+	Response:
+		{}		Json string of child node objects
 
 ### /oakRepo/delete ###
 
  Api to get the delete a node and its sub tree by absolute node path.
 
-**Method:** POST
-**Params:**
-	**path**	String 	absolute node path
-**Response:**
-	Success
+	Method: POST
+	Params:
+		path*	String 	absolute node path
+	Response:
+		Success
 
 ### /oakRepo/createNode ###
 
 Api to create a new entity in jackrabbit repository at specified path. if path exists then node get created as child with new random id.
 
-**Method:** POST
-**Params:**
-	**parentPath**	String 	node path or node parent path to create node at
-	**json**		JSON 	json string with node properties to create new node
-	cls				String 	specify fully qualified class name for json to type cast in
-	nodeName		String 	optional specify if don't want random id as node name
-**Response:**
-	{}		json of newly created object
+	Method: POST
+	Params:
+		parentPath*	String 	node path or node parent path to create node at
+		json*		JSON 	json string with node properties to create new node
+		cls				String 	specify fully qualified class name for json to type cast in
+		nodeName		String 	optional specify if don't want random id as node name
+	Response:
+		{}		json of newly created object
 
 ### /oakRepo/moveNode ###
 
 Api to move or rename node or tree from one to another path. Make sure both path must exists
 
-**Method:** POST
-**Params:**
-	**src**		String 	source node absolute path
-	**dest**	String 	destination node path
-**Response:**
-	{"Result": "Success"}
+	Method: POST
+	Params:
+		src*		String 	source node absolute path
+		dest*		String 	destination node path
+	Response:
+		{"Result": "Success"}
 
 ### /oakRepo/similar ###
 
 Api to find similar nodes as input node path
 
-**Method:** POST
-**Params:**
-	**absPath**		String 	input source node absolute path
-**Response:**
-	{{},{}}		JSON List of similar nodes json string
+	Method: POST
+	Params:
+		absPath*		String 	input source node absolute path
+	Response:
+		{{},{}}		JSON List of similar nodes json string
 
 ### /oakRepo/suggestions ###
 
 Api to get suggestions for input string
 
-**Method:** POST
-**Params:**
-	**input**	String
-**Response:**
-	{, }	JSON List of suggested string
+	Method: POST
+	Params:
+		input*		String
+	Response:
+		{, }	JSON List of suggested string
 
 ### /oakRepo/spellcheck ###
 
 Api to find correct spelling for input string
 
-**Method:** POST
-**Params:**
-	**input**	String
-**Response:**
-	{, }		JSON List of suggested spellings
+	Method: POST
+	Params:
+		input*		String
+	Response:
+		{, }		JSON List of suggested spellings
 
 ### /oakRepo/search ###
 
 Api to search input query in jackrabbit repository.
 
-**Method:** POST
-**Params:**
-	**path**		String 	absolute node path to search in repository.
-	**cols**		String 	fields to be searched for query
-	**query**		String 	string to search
-	**orderBy**		String 	comma separate list of columns for result sorting.
-**Response:**
-	{{},{}}		json List object of search result nodes as string
+	Method: POST
+	Params:
+		path*		String 	absolute node path to search in repository.
+		cols*		String 	fields to be searched for query
+		query*		String 	string to search
+		orderBy*	String 	comma separate list of columns for result sorting.
+	Response:
+		{{},{}}	json List object of search result nodes as string
 
 
 ### Who do I talk to? ###

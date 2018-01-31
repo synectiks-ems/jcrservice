@@ -54,7 +54,7 @@ public class OakController {
 	}
 
 	/**
-	 * Api to get the list of child nodes by absolute node path.
+	 * Api to get the delete a node and its sub tree by absolute node path.
 	 * @param path
 	 * @return Json string of child node objects
 	 */

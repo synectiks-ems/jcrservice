@@ -114,5 +114,5 @@ Api to search input query in jackrabbit repository.
 
 
 ### Who do I talk to? ###
-	Please mail me on
-	sharmanju80@gmail.com
+	Please mail us on
+	info@syenctiks.com

@@ -96,8 +96,7 @@ public class OakController {
 					+ ", nodeName: " + nodeName);
 			node = oakRepoManager.createNode(nodeName, parentPath, node, clazz);
 		} catch (Throwable ex) {
-			ex.printStackTrace();
-			logger.error(ex.getMessage(), IUtils.getFailedResponse(ex));
+			logger.error(ex.getMessage(), ex);
 			return new ResponseEntity<>(IUtils.getFailedResponse(ex).toString(),
 					HttpStatus.PRECONDITION_FAILED);
 		}

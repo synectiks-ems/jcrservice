@@ -17,7 +17,10 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.synectiks.commons.entities.oak.OakFileNode;
 import com.synectiks.commons.interfaces.IApiController;
 import com.synectiks.commons.utils.IUtils;
 
@@ -34,6 +37,17 @@ public class OakController {
 
 	@Autowired
 	private OakManager oakRepoManager;
+
+	/**
+	 * Service API for uploading a file on server for OakFileNode.
+	 * @param file add your uploaded file with 'file' name param
+	 * @return {@code ResponseEntity} with absolute file path of file on server
+	 */
+	@RequestMapping(value = "/upload")
+	public ResponseEntity<Object> uploadAttachment(@RequestParam String upPath,
+			@RequestPart MultipartFile file) {
+		return IUtils.saveUploadedFile(file, upPath);
+	}
 
 	/**
 	 * Api to get the list of child nodes by absolute node path.
@@ -89,6 +103,9 @@ public class OakController {
 			Class<?> clazz = IUtils.loadClass(cls);
 			if (!IUtils.isNull(clazz)) {
 				node = IUtils.OBJECT_MAPPER.readValue(json, clazz);
+				if (OakFileNode.class.getName().equals(cls)) {
+					IUtils.loadFileStreamInNode((OakFileNode) node);
+				}
 			} else {
 				node = new JSONObject(json);
 			}

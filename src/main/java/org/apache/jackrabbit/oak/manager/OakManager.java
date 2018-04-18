@@ -195,35 +195,49 @@ public class OakManager {
 			if (node instanceof OakEntity) {
 				OakEntity oakEnt = ((OakEntity) node);
 				// verify to check if jcrPath has set
-				if (IUtils.isNull(oakEnt.getJcrPath()) && !IUtils.isNull(nodePath)) {
-					if (session.nodeExists(nodePath)) {
-						if (!IUtils.isNullOrEmpty(nodeName)) {
-							nodePath += (nodePath.endsWith("/") ? nodeName
-									: "/" + nodeName);
-						} else {
-							logger.warn("Node at '" + nodePath + "' already exists.");
-						}
-					} else {
-						createParentPath(nodePath, nodeName);
-					}
-					// set jcr path if not set
-					if (IUtils.isNullOrEmpty(oakEnt.getJcrPath())) {
-						oakEnt.setJcrPath(nodePath);
-					}
-					// Update oak file node stream from file system.
-					if (node instanceof OakFileNode) {
-						IUtils.updateFileStream((OakFileNode) node);
+				if (IUtils.isNullOrEmpty(oakEnt.getJcrPath())) {
+					if (IUtils.isNullOrEmpty(nodePath)) {
+						// user default root as node path
+						logger.warn("Node path '" + nodePath + "' is null or empty.");
+						nodePath = "/";
 					}
 				}
+				// Set node path with node name and create if not exists
+				if (!session.nodeExists(nodePath)) {
+					createParentPath(nodePath, nodeName);
+				}
+				// Verify node name
+				if (IUtils.isNullOrEmpty(nodeName)) {
+					logger.warn("Node name is null or empty.");
+					nodeName = UUID.randomUUID().toString();
+				}
+				// Set node name in node path
+				if (nodePath.lastIndexOf("/") >= 0 &&
+						!nodeName.equals(nodePath.substring(nodePath.lastIndexOf("/") + 1))) {
+					nodePath += (nodePath.endsWith("/") ? nodeName : "/" + nodeName);
+				}
+				logger.info("Node path: " + nodePath);
+				// set jcr path if not set
+				if (IUtils.isNullOrEmpty(oakEnt.getJcrPath()) ||
+						!nodePath.equals(oakEnt.getJcrPath())) {
+					logger.info("Node path set: " + nodePath);
+					oakEnt.setJcrPath(nodePath);
+				}
+				// Update oak file node stream from file system.
+				if (node instanceof OakFileNode) {
+					logger.info("Node file stream set");
+					IUtils.updateFileStream((OakFileNode) node);
+				}
 				logger.info("Node: " + node);
-				if (ocmManager.objectExists(oakEnt.getJcrPath())
+				if (ocmManager.objectExists(nodePath)
 						&& !IUtils.isNull(clazz)) {
-					Object nd = ocmManager.getObject(clazz, oakEnt.getJcrPath());
+					Object nd = ocmManager.getObject(clazz, nodePath);
 					logger.info("Existing node: " + nd);
 					BeanUtils.copyProperties(node, nd);
 					logger.info("AfterUpdate node: " + nd);
 					ocmManager.update(nd);
 				} else {
+					logger.info("Insert Node at: " + nodePath);
 					ocmManager.insert(node);
 				}
 				ocmManager.save();

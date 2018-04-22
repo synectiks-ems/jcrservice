@@ -3,7 +3,11 @@
  */
 package org.apache.jackrabbit.oak.controllers;
 
+import java.io.InputStream;
 import java.util.List;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.jackrabbit.oak.manager.OakManager;
 import org.codehaus.jettison.json.JSONObject;
@@ -20,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.synectiks.commons.constants.IConsts;
 import com.synectiks.commons.entities.oak.OakFileNode;
 import com.synectiks.commons.interfaces.IApiController;
 import com.synectiks.commons.utils.IUtils;
@@ -47,6 +52,41 @@ public class OakController {
 	public ResponseEntity<Object> uploadAttachment(@RequestParam String upPath,
 			@RequestPart MultipartFile file) {
 		return IUtils.saveUploadedFile(file, upPath);
+	}
+
+	/**
+	 * Api to get the list of child nodes by absolute node path.
+	 * @param path
+	 * @return Json string of child node objects
+	 */
+	@RequestMapping("/download")
+	public ResponseEntity<String> downloadNodeFile(@RequestParam String path,
+			HttpServletResponse response) {
+		logger.info("download request: " + path);
+		try {
+			OakFileNode node = oakRepoManager.getFileNode(path);
+			if (!IUtils.isNull(node) && !IUtils.isNull(node.getData())) {
+				response.setContentType(node.getContentType());
+				response.setHeader(IConsts.CONT_TYPE, node.getContentType());
+				response.setHeader("Content-Disposition",
+						"attachment; filename=\"" + node.getName() + "\"");
+				logger.info("Found: " + node.getName() + ", with content type: "
+						+ node.getContentType());
+				ServletOutputStream out = response.getOutputStream();
+				byte[] buffer = new byte[2048];
+				InputStream is = node.getData();
+				while ((is.read(buffer)) > 0) {
+					out.write(buffer);
+				}
+				is.close();
+				out.flush();
+			}
+		} catch (Throwable ex) {
+			logger.error(ex.getMessage(), ex);
+			return new ResponseEntity<>(IUtils.getFailedResponse(ex).toString(),
+					HttpStatus.PRECONDITION_FAILED);
+		}
+		return null;
 	}
 
 	/**

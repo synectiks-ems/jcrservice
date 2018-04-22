@@ -164,6 +164,44 @@ public class OakManager {
 	 * @return
 	 * @throws Exception
 	 */
+	public OakFileNode getFileNode(String path) throws Exception {
+		check();
+		OakFileNode node = null;
+		if (!IUtils.isNullOrEmpty(path)) {
+			if (!path.equals("/")) {
+				if (!ocmManager.objectExists(path)) {
+					logger.error("Node not found at path: " + path);
+					return node;
+				}
+				Object obj = ocmManager.getObject(OakFileNode.class, path);
+				if (IUtils.isNull(obj)) {
+					if (session.nodeExists(path)) {
+						Node nd = session.getNode(path);
+						node = new OakFileNode();
+						BeanUtils.copyProperties(nd, node);
+						logger.info("Found: " + node);
+					} else {
+						logger.error("No node found at path: " + path);
+					}
+				} else {
+					logger.info("Node found in ocamManager");
+					node = new OakFileNode();
+					BeanUtils.copyProperties(obj, node);
+				}
+			} else {
+				logger.warn("You are trying to download root node.");
+			}
+		}
+		logger.info("Res: " + node);
+		return node;
+	}
+
+	/**
+	 * Method to generate full node hierarchy json
+	 * @param path
+	 * @return
+	 * @throws Exception
+	 */
 	public String listNodes(String path) throws Exception {
 		check();
 		StringBuilder sb = new StringBuilder();

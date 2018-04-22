@@ -124,7 +124,7 @@ public class RepositoryInitializer {
         config.put("repo.home", repoHomeDir.getAbsolutePath());
         config.put("oak.mongo.db", mongoDbName);
         config.put("oak.mongo.uri", getMongoURI());
-log.info("Config: " + config);
+        log.info("Config: " + config);
         //Configures BundleActivator to get notified of
         //OSGi startup and shutdown
         configureActivator(config);
@@ -135,9 +135,9 @@ log.info("Config: " + config);
     private String getMongoURI() {
         List<String> mongoOpts = args.getOptionValues(ARG_MONGO);
         if (mongoOpts != null && !mongoOpts.isEmpty()){
-            return mongoOpts.get(0);
+            return mongouri;
         }
-        return mongouri;
+        return null;
     }
 
     private Object commaSepFilePaths(List<String> repoConfigs) {
@@ -160,7 +160,10 @@ log.info("Config: " + config);
     private List<String> determineConfigFileNamesToCopy() {
         List<String> configNames = Lists.newArrayList();
         configNames.add("repository-config.json");
-
+        log.info("App params:");
+        for (String key : args.getOptionNames()) {
+            log.info(key + ": " + args.getOptionValues(key));
+        }
         //Mongo mode can be selected via --mongo
         if (args.containsOption(ARG_MONGO)) {
             configNames.add("mongomk-config.json");

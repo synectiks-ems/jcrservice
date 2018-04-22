@@ -55,6 +55,7 @@ import org.springframework.core.io.Resource;
 
 @Configuration
 public class RepositoryInitializer {
+
     public static final String ARG_MONGO = "mongo";
     private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -135,9 +136,9 @@ public class RepositoryInitializer {
     private String getMongoURI() {
         List<String> mongoOpts = args.getOptionValues(ARG_MONGO);
         if (mongoOpts != null && !mongoOpts.isEmpty()){
-            return mongoOpts.get(0);
+            return mongouri;
         }
-        return mongouri;
+        return null;
     }
 
     private Object commaSepFilePaths(List<String> repoConfigs) {
@@ -160,7 +161,10 @@ public class RepositoryInitializer {
     private List<String> determineConfigFileNamesToCopy() {
         List<String> configNames = Lists.newArrayList();
         configNames.add("repository-config.json");
-
+        log.info("App params:");
+        for (String key : args.getOptionNames()) {
+            log.info(key + ": " + args.getOptionValues(key));
+        }
         //Mongo mode can be selected via --mongo
         if (args.containsOption(ARG_MONGO)) {
             configNames.add("mongomk-config.json");

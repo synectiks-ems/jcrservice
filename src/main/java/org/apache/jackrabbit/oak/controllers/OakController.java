@@ -12,11 +12,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.synectiks.commons.interfaces.IApiController;
 import com.synectiks.commons.utils.IUtils;
@@ -24,7 +24,7 @@ import com.synectiks.commons.utils.IUtils;
 /**
  * @author Rajesh
  */
-@Controller
+@RestController
 @RequestMapping(path = IApiController.API_PATH
 	+ IApiController.URL_OAKREPO, method = RequestMethod.POST)
 @CrossOrigin

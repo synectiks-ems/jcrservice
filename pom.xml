@@ -21,7 +21,7 @@
 	<parent>
 		<groupId>org.apache.jackrabbit</groupId>
 		<artifactId>oak-parent</artifactId>
-		<version>1.9.0</version>
+		<version>1.12.0</version>
 	</parent>
 	<artifactId>jcrservice</artifactId>
 
@@ -32,7 +32,7 @@
 		<skip.deployment>true</skip.deployment>
 		<slf4j.version>1.7.21</slf4j.version>
 		<slf4j.api.version>1.7.21</slf4j.api.version>
-		<spring.boot.version>1.5.7.RELEASE</spring.boot.version>
+		<spring.boot.version>2.1.0.RELEASE</spring.boot.version>
 	</properties>
 
 	<dependencyManagement>
@@ -103,7 +103,6 @@
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<version>${h2.version}</version>
 			<optional>true</optional>
 		</dependency>
 
@@ -169,17 +168,16 @@
 		<dependency>
 			<groupId>com.googlecode.json-simple</groupId>
 			<artifactId>json-simple</artifactId>
+			<version>1.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>1.1.7</version>
-		</dependency>
+			</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-core</artifactId>
-			<version>1.1.7</version>
-		</dependency>
+			</dependency>
 
 		<!-- Required for Felix WebConsole -->
 		<dependency>
@@ -207,6 +205,7 @@
 		<dependency>
 			<groupId>org.codehaus.groovy</groupId>
 			<artifactId>groovy-all</artifactId>
+			<version>2.4.16</version>
 		</dependency>
 
 		<dependency>
@@ -251,7 +250,13 @@
 		<dependency>
 			<groupId>com.synectiks</groupId>
 			<artifactId>common-libraries</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>2.0.0-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.data</groupId>
+					<artifactId>spring-data-elasticsearch</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 
@@ -296,7 +301,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
-				<version>2.18.1</version>
 				<configuration>
 					<systemPropertyVariables>
 						<java.util.logging.config.file>

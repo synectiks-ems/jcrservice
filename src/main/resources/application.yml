@@ -1,3 +1,4 @@
+# 8093
 server:
   port: ${SERVER_PORT}
 repo:
@@ -7,3 +8,10 @@ oak:
   mongo:
     db: ${DB_NAME}
     uri: mongodb://${MONGO_HOST}:${MONGO_PORT}
+logging:
+  level:
+    web: TRACE
+    org.springframework.web: TRACE
+spring:
+  http:
+    log-request-details: true

@@ -19,13 +19,25 @@
 
 package org.apache.jackrabbit.oak.standalone;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 @SpringBootApplication
 public class OakServer {
 
-    public static void main(String[] args) {
-        SpringApplication.run(OakServer.class, args);
-    }
+	private static final Logger logger = LoggerFactory.getLogger(OakServer.class);
+
+	public static void main(String[] args) {
+		ConfigurableApplicationContext ctx = SpringApplication.run(OakServer.class, args);
+		RequestMappingHandlerMapping bean = ctx
+				.getBean(RequestMappingHandlerMapping.class);
+		bean.getHandlerMethods().forEach((key, value) -> {
+			logger.info("Key: " + key);
+			logger.info("Value: " + key);
+		});
+	}
 }

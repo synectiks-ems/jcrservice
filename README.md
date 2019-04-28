@@ -22,7 +22,7 @@ You can run this application as spring-boot app by following command:
 #### Its not running as standalone at present ####
 Once done you can run the application by executing 
 
-	$ java -jar target/jcrservice-1.7.11.jar
+	$ java -jar target/jcrservice-1.12.0.jar
 
 ## Application api's documentation ##
 

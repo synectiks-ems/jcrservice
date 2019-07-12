@@ -180,17 +180,13 @@ public class RepositoryInitializer {
             throws IOException, RepositoryException {
         if (!repoConfig.exists()){
             log.info("Copying default repository config to {}", repoConfig.getAbsolutePath());
-            InputStream in = defaultRepoConfig.getInputStream();
-            if (in == null){
-                throw new RepositoryException("No config file found in classpath " + defaultRepoConfig);
-            }
-            OutputStream os = null;
-            try {
-                os = FileUtils.openOutputStream(repoConfig);
-                IOUtils.copy(in, os);
-            } finally {
-                IOUtils.closeQuietly(os);
-                IOUtils.closeQuietly(in);
+            try(InputStream in = defaultRepoConfig.getInputStream()) {
+	            if (in == null){
+	                throw new RepositoryException("No config file found in classpath " + defaultRepoConfig);
+	            }
+	            try(OutputStream os = FileUtils.openOutputStream(repoConfig)) {
+	                IOUtils.copy(in, os);
+	            }
             }
         }
     }

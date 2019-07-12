@@ -22,7 +22,11 @@ You can run this application as spring-boot app by following command:
 #### Its not running as standalone at present ####
 Once done you can run the application by executing 
 
-	$ java -jar target/jcrservice-1.12.0.jar
+	$ java -jar target\jcrservice-1.12.0.jar --SERVER_PORT=8093 --REPO_HOME=D:/Rajesh/jcrRepo --DB_NAME=jcr --MONGO_HOST=localhost --MONGO_PORT=27017 --mongo=true
+
+OR
+	
+	$ mvn spring-boot:run -Dspring-boot.run.arguments=--SERVER_PORT=8093,--REPO_HOME=D:/Rajesh/oakRepo,--DB_NAME=oak,--MONGO_HOST=localhost,--MONGO_PORT=27017
 
 ## Application api's documentation ##
 

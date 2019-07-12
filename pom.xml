@@ -11,7 +11,8 @@
 	OF ANY KIND, either express or implied. See the License for the specific 
 	language governing permissions and limitations under the License. -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -21,7 +22,7 @@
 	<parent>
 		<groupId>org.apache.jackrabbit</groupId>
 		<artifactId>oak-parent</artifactId>
-		<version>1.12.0</version>
+		<version>1.14.0</version>
 	</parent>
 	<artifactId>jcrservice</artifactId>
 
@@ -32,7 +33,7 @@
 		<skip.deployment>true</skip.deployment>
 		<slf4j.version>1.7.21</slf4j.version>
 		<slf4j.api.version>1.7.21</slf4j.api.version>
-		<spring.boot.version>2.1.0.RELEASE</spring.boot.version>
+		<spring.boot.version>2.1.5.RELEASE</spring.boot.version>
 	</properties>
 
 	<dependencyManagement>
@@ -124,10 +125,6 @@
 					<groupId>commons-logging</groupId>
 					<artifactId>commons-logging</artifactId>
 				</exclusion>
-				<exclusion>
-					<groupId>org.apache.httpcomponents</groupId>
-					<artifactId>httpcore</artifactId>
-				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -173,11 +170,11 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			</dependency>
+		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-core</artifactId>
-			</dependency>
+		</dependency>
 
 		<!-- Required for Felix WebConsole -->
 		<dependency>

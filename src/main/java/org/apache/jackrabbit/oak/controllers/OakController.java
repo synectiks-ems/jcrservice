@@ -32,10 +32,10 @@ import com.synectiks.commons.utils.IUtils;
 /**
  * @author Rajesh
  */
+@CrossOrigin
 @RestController
 @RequestMapping(path = IApiController.API_PATH
 	+ IApiController.URL_OAKREPO, method = RequestMethod.POST)
-@CrossOrigin
 public class OakController {
 
 	private static final Logger logger = LoggerFactory.getLogger(OakController.class);

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.jackrabbit.oak.standalone;
+package org.apache.jackrabbit.oak;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

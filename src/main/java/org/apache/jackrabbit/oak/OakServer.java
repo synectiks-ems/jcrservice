@@ -17,19 +17,19 @@
  * under the License.
  */
 
-package org.apache.jackrabbit.oak.standalone;
+package org.apache.jackrabbit.oak;
 
-import javax.servlet.ServletContext;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.mock.web.MockServletContext;
+@SpringBootApplication
+@EnableAutoConfiguration
+@ComponentScan("org.apache.jackrabbit")
+public class OakServer {
 
-@Configuration
-public class TestConfig {
-
-    @Bean
-    public ServletContext getServletContext() {
-        return new MockServletContext();
+    public static void main(String[] args) {
+        SpringApplication.run(OakServer.class, args);
     }
 }

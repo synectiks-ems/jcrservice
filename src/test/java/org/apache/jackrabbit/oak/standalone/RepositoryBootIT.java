@@ -25,6 +25,7 @@ import javax.jcr.SimpleCredentials;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.apache.jackrabbit.oak.OakServer;
 import org.apache.jackrabbit.oak.standalone.TestConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;

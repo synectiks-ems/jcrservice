@@ -242,6 +242,9 @@ public class OakManager {
 				}
 				// Set node path with node name and create if not exists
 				if (!session.nodeExists(nodePath)) {
+					if (IUtils.isNullOrEmpty(nodeName)) {
+						nodeName = nodePath.substring(nodePath.lastIndexOf("/") + 1);
+					}
 					createParentPath(nodePath, nodeName);
 				}
 				// Verify node name

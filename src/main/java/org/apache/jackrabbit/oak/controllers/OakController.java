@@ -59,15 +59,20 @@ public class OakController {
 	 * @param path
 	 * @return Json string of child node objects
 	 */
-	@RequestMapping("/download")
+	@RequestMapping(value = "/download", method = RequestMethod.GET)
 	public ResponseEntity<String> downloadNodeFile(@RequestParam String path,
 			HttpServletResponse response) {
 		logger.info("download request: " + path);
 		try {
 			OakFileNode node = oakRepoManager.getFileNode(path);
 			if (!IUtils.isNull(node) && !IUtils.isNull(node.getData())) {
+				response.setHeader("Access-Control-Expose-Headers",
+						"X-Suggested-Filename, Content-Disposition, Content-Type");
+				response.setHeader("Access-Control-Allow-Headers",
+					"X-Suggested-Filename, Content-Disposition, Content-Type");
 				response.setContentType(node.getContentType());
 				response.setHeader(IConsts.CONT_TYPE, node.getContentType());
+				response.setHeader("X-Suggested-Filename",node.getName());
 				response.setHeader("Content-Disposition",
 						"attachment; filename=\"" + node.getName() + "\"");
 				logger.info("Found: " + node.getName() + ", with content type: "
@@ -94,7 +99,7 @@ public class OakController {
 	 * @param path
 	 * @return Json string of child node objects
 	 */
-	@RequestMapping("/list")
+	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public ResponseEntity<String> listNodes(@RequestParam String path) {
 		String nodes = null;
 		try {
@@ -184,7 +189,7 @@ public class OakController {
 	 * @param absPath
 	 * @return list of similar nodes
 	 */
-	@RequestMapping("/similar")
+	@RequestMapping(value = "/similar", method = RequestMethod.GET)
 	public ResponseEntity<Object> findSimilarNodes(@RequestParam String absPath) {
 		List<String> res = null;
 		try {
@@ -202,7 +207,7 @@ public class OakController {
 	 * @param input
 	 * @return
 	 */
-	@RequestMapping("/suggestions")
+	@RequestMapping(value = "/suggestions", method = RequestMethod.GET)
 	public ResponseEntity<Object> getSuggestions(@RequestParam String input) {
 		List<String> res = null;
 		try {
@@ -220,7 +225,7 @@ public class OakController {
 	 * @param input
 	 * @return
 	 */
-	@RequestMapping("/spellcheck")
+	@RequestMapping(value = "/spellcheck", method = RequestMethod.GET)
 	public ResponseEntity<Object> getSpellcheck(@RequestParam String input) {
 		List<String> res = null;
 		try {
@@ -241,7 +246,7 @@ public class OakController {
 	 * @param orderBy comma separate list of columns for result sorting.
 	 * @return json List object of search result nodes as string
 	 */
-	@RequestMapping("/search")
+	@RequestMapping(value = "/search", method = RequestMethod.GET)
 	public ResponseEntity<Object> search(
 			@RequestParam String path, @RequestParam String cols,
 			@RequestParam String query, @RequestParam String orderBy) {

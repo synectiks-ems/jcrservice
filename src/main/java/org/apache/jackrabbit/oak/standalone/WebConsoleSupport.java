@@ -71,8 +71,8 @@ public class WebConsoleSupport {
     }
 
     @Bean
-    public ServletRegistrationBean felixProxyServlet() {
-        return new ServletRegistrationBean(new ProxyServlet(), "/osgi/*");
+    public ServletRegistrationBean<ProxyServlet> felixProxyServlet() {
+        return new ServletRegistrationBean<ProxyServlet>(new ProxyServlet(), "/osgi/*");
     }
 
     @Bean

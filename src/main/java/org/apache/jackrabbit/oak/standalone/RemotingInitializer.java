@@ -53,8 +53,8 @@ public class RemotingInitializer {
     private ServletContext servletContext;
 
     @Bean
-    public ServletRegistrationBean webDavServlet() {
-        ServletRegistrationBean bean = new ServletRegistrationBean(new SimpleWebdavServlet() {
+    public ServletRegistrationBean<SimpleWebdavServlet> webDavServlet() {
+        ServletRegistrationBean<SimpleWebdavServlet> bean = new ServletRegistrationBean<SimpleWebdavServlet>(new SimpleWebdavServlet() {
 
 			private static final long serialVersionUID = 4410411295230555384L;
 
@@ -75,8 +75,8 @@ public class RemotingInitializer {
     }
 
     @Bean
-    public ServletRegistrationBean remotingServlet() {
-        ServletRegistrationBean bean = new ServletRegistrationBean(new JcrRemotingServlet() {
+    public ServletRegistrationBean<JcrRemotingServlet> remotingServlet() {
+        ServletRegistrationBean<JcrRemotingServlet> bean = new ServletRegistrationBean<JcrRemotingServlet>(new JcrRemotingServlet() {
 
 			private static final long serialVersionUID = 1L;
 

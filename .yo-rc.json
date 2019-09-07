@@ -1,0 +1,38 @@
+{
+  "generator-jhipster": {
+    "promptValues": {
+      "packageName": "org.apache.jackrabbit.oak"
+    },
+    "jhipsterVersion": "6.2.0",
+    "applicationType": "monolith",
+    "baseName": "jcrservice",
+    "packageName": "org.apache.jackrabbit.oak",
+    "packageFolder": "org/apache/jackrabbit/oak",
+    "serverPort": "8093",
+    "authenticationType": "jwt",
+    "cacheProvider": "no",
+    "enableHibernateCache": false,
+    "websocket": false,
+    "databaseType": "no",
+    "devDatabaseType": "no",
+    "prodDatabaseType": "no",
+    "searchEngine": false,
+    "messageBroker": false,
+    "serviceDiscoveryType": false,
+    "buildTool": "maven",
+    "enableSwaggerCodegen": false,
+    "jwtSecretKey": "ZDEwYTA0ODJkMDkyZGU0ZjBhMjQ3Yzk1ZDVkZDllNzQ4MDQ0NDNiMDcxNzliZmU5NjM4MWM2Nzc3M2Y1NjJkODRkYzU3ZmNmMDg5OTcyYzc3ZWE0Y2I1YjYzODEzNjU3YzNjNTcxMDVjNGExZDg2NDM0ZGRjZTgxNDQ5ZmFiMDE=",
+    "useSass": true,
+    "clientPackageManager": "npm",
+    "clientFramework": "react",
+    "clientTheme": "none",
+    "clientThemeVariant": "",
+    "testFrameworks": [],
+    "jhiPrefix": "jhi",
+    "entitySuffix": "",
+    "dtoSuffix": "DTO",
+    "otherModules": [],
+    "enableTranslation": false,
+    "blueprints": []
+  }
+}

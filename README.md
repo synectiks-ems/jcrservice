@@ -1,122 +1,163 @@
-# jcrservice #
+# jcrservice
 
-### What is this repository for? ###
-A highly scalable content repository service for any base application
+This application was generated using JHipster 6.2.0, you can find documentation and help at [https://www.jhipster.tech/documentation-archive/v6.2.0](https://www.jhipster.tech/documentation-archive/v6.2.0).
 
-### How to import project for editing ###
+## Development
 
-* Import as maven project in your IDE
+Before you can build this project, you must install and configure the following dependencies on your machine:
 
-### Build, install and run application ###
+1. [Node.js][]: We use Node to run a development web server and build the project.
+   Depending on your system, you can install Node either from source or as a pre-packaged bundle.
 
-To get started build the build the latest sources with Maven 3 and Java 8 
-(or higher). 
+After installing Node, you should be able to run the following command to install development tools.
+You will only need to run this command when dependencies change in [package.json](package.json).
 
-	$ cd jcrservice
-	$ mvn clean install 
+    npm install
 
-You can run this application as spring-boot app by following command:
+We use npm scripts and [Webpack][] as our build system.
 
-	$ mvn spring-boot:run
+Run the following commands in two separate terminals to create a blissful development experience where your browser
+auto-refreshes when files change on your hard drive.
 
-#### Its not running as standalone at present ####
-Once done you can run the application by executing 
+    ./mvnw
+    npm start
 
-	$ java -jar target\jcrservice-1.12.0.jar --SERVER_PORT=8093 --REPO_HOME=D:/Rajesh/jcrRepo --DB_NAME=jcr --MONGO_HOST=localhost --MONGO_PORT=27017 --mongo=true
+Npm is also used to manage CSS and JavaScript dependencies used in this application. You can upgrade dependencies by
+specifying a newer version in [package.json](package.json). You can also run `npm update` and `npm install` to manage dependencies.
+Add the `help` flag on any command to see how you can use it. For example, `npm help update`.
 
-OR
-	
-	$ mvn spring-boot:run -Dspring-boot.run.arguments=--SERVER_PORT=8093,--REPO_HOME=D:/Rajesh/oakRepo,--DB_NAME=oak,--MONGO_HOST=localhost,--MONGO_PORT=27017
+The `npm run` command will list all of the scripts available to run for this project.
 
-## Application api's documentation ##
+### PWA Support
 
-### /oakRepo/list ###
+JHipster ships with PWA (Progressive Web App) support, and it's disabled by default. One of the main components of a PWA is a service worker.
 
-Api to get the list of child nodes by absolute node path.
+The service worker initialization code is commented out by default. To enable it, uncomment the following code in `src/main/webapp/index.html`:
 
-	Method: POST
-	Params:
-		path*	String 	absolute node path
-	Response:
-		{}		Json string of child node objects
+```html
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./service-worker.js').then(function() {
+      console.log('Service Worker Registered');
+    });
+  }
+</script>
+```
 
-### /oakRepo/delete ###
+Note: [Workbox](https://developers.google.com/web/tools/workbox/) powers JHipster's service worker. It dynamically generates the `service-worker.js` file.
 
- Api to get the delete a node and its sub tree by absolute node path.
+### Managing dependencies
 
-	Method: POST
-	Params:
-		path*	String 	absolute node path
-	Response:
-		Success
+For example, to add [Leaflet][] library as a runtime dependency of your application, you would run following command:
 
-### /oakRepo/createNode ###
+    npm install --save --save-exact leaflet
 
-Api to create a new entity in jackrabbit repository at specified path. if path exists then node get created as child with new random id.
+To benefit from TypeScript type definitions from [DefinitelyTyped][] repository in development, you would run following command:
 
-	Method: POST
-	Params:
-		parentPath*	String 	node path or node parent path to create node at
-		json*		JSON 	json string with node properties to create new node
-		cls				String 	specify fully qualified class name for json to type cast in
-		nodeName		String 	optional specify if don't want random id as node name
-	Response:
-		{}		json of newly created object
+    npm install --save-dev --save-exact @types/leaflet
 
-### /oakRepo/moveNode ###
+Then you would import the JS and CSS files specified in library's installation instructions so that [Webpack][] knows about them:
+Note: There are still a few other things remaining to do for Leaflet that we won't detail here.
 
-Api to move or rename node or tree from one to another path. Make sure both path must exists
+For further instructions on how to develop with JHipster, have a look at [Using JHipster in development][].
 
-	Method: POST
-	Params:
-		src*		String 	source node absolute path
-		dest*		String 	destination node path
-	Response:
-		{"Result": "Success"}
+## Building for production
 
-### /oakRepo/similar ###
+### Packaging as jar
 
-Api to find similar nodes as input node path
+To build the final jar and optimize the jcrservice application for production, run:
 
-	Method: POST
-	Params:
-		absPath*		String 	input source node absolute path
-	Response:
-		{{},{}}		JSON List of similar nodes json string
+    ./mvnw -Pprod clean verify
 
-### /oakRepo/suggestions ###
+This will concatenate and minify the client CSS and JavaScript files. It will also modify `index.html` so it references these new files.
+To ensure everything worked, run:
 
-Api to get suggestions for input string
+    java -jar target/*.jar
 
-	Method: POST
-	Params:
-		input*		String
-	Response:
-		{, }	JSON List of suggested string
+Then navigate to [http://localhost:8093](http://localhost:8093) in your browser.
 
-### /oakRepo/spellcheck ###
+Refer to [Using JHipster in production][] for more details.
 
-Api to find correct spelling for input string
+### Packaging as war
 
-	Method: POST
-	Params:
-		input*		String
-	Response:
-		{, }		JSON List of suggested spellings
+To package your application as a war in order to deploy it to an application server, run:
 
-### /oakRepo/search ###
+    ./mvnw -Pprod,war clean verify
 
-Api to search input query in jackrabbit repository.
+## Testing
 
-	Method: POST
-	Params:
-		path*		String 	absolute node path to search in repository.
-		cols*		String 	fields to be searched for query
-		query*		String 	string to search
-		orderBy*	String 	comma separate list of columns for result sorting.
-	Response:
-		{{},{}}	json List object of search result nodes as string
+To launch your application's tests, run:
 
-### Who do I talk to? ###
-	Please mail us on
-	info@syenctiks.com
+    ./mvnw verify
+
+### Client tests
+
+Unit tests are run by [Jest][] and written with [Jasmine][]. They're located in [src/test/javascript/](src/test/javascript/) and can be run with:
+
+    npm test
+
+For more information, refer to the [Running tests page][].
+
+### Code quality
+
+Sonar is used to analyse code quality. You can start a local Sonar server (accessible on http://localhost:9001) with:
+
+```
+docker-compose -f src/main/docker/sonar.yml up -d
+```
+
+You can run a Sonar analysis with using the [sonar-scanner](https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner) or by using the maven plugin.
+
+Then, run a Sonar analysis:
+
+```
+./mvnw -Pprod clean verify sonar:sonar
+```
+
+If you need to re-run the Sonar phase, please be sure to specify at least the `initialize` phase since Sonar properties are loaded from the sonar-project.properties file.
+
+```
+./mvnw initialize sonar:sonar
+```
+
+or
+
+For more information, refer to the [Code quality page][].
+
+## Using Docker to simplify development (optional)
+
+You can use Docker to improve your JHipster development experience. A number of docker-compose configuration are available in the [src/main/docker](src/main/docker) folder to launch required third party services.
+
+You can also fully dockerize your application and all the services that it depends on.
+To achieve this, first build a docker image of your app by running:
+
+    ./mvnw -Pprod verify jib:dockerBuild
+
+Then run:
+
+    docker-compose -f src/main/docker/app.yml up -d
+
+For more information refer to [Using Docker and Docker-Compose][], this page also contains information on the docker-compose sub-generator (`jhipster docker-compose`), which is able to generate docker configurations for one or several JHipster applications.
+
+## Continuous Integration (optional)
+
+To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`), this will let you generate configuration files for a number of Continuous Integration systems. Consult the [Setting up Continuous Integration][] page for more information.
+
+[jhipster homepage and latest documentation]: https://www.jhipster.tech
+[jhipster 6.2.0 archive]: https://www.jhipster.tech/documentation-archive/v6.2.0
+[using jhipster in development]: https://www.jhipster.tech/documentation-archive/v6.2.0/development/
+[using docker and docker-compose]: https://www.jhipster.tech/documentation-archive/v6.2.0/docker-compose
+[using jhipster in production]: https://www.jhipster.tech/documentation-archive/v6.2.0/production/
+[running tests page]: https://www.jhipster.tech/documentation-archive/v6.2.0/running-tests/
+[code quality page]: https://www.jhipster.tech/documentation-archive/v6.2.0/code-quality/
+[setting up continuous integration]: https://www.jhipster.tech/documentation-archive/v6.2.0/setting-up-ci/
+[node.js]: https://nodejs.org/
+[yarn]: https://yarnpkg.org/
+[webpack]: https://webpack.github.io/
+[angular cli]: https://cli.angular.io/
+[browsersync]: http://www.browsersync.io/
+[jest]: https://facebook.github.io/jest/
+[jasmine]: http://jasmine.github.io/2.0/introduction.html
+[protractor]: https://angular.github.io/protractor/
+[leaflet]: http://leafletjs.com/
+[definitelytyped]: http://definitelytyped.org/

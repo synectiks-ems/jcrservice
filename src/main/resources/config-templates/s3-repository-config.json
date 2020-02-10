@@ -23,8 +23,8 @@
 		
 	},
 	"org.apache.jackrabbit.oak.plugins.blob.datastore.S3DataStore": {
-		"accessKey": "AKIAJ5HPZP63M5WPNWVA",
-		"secretKey": "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",
+		"accessKey": "*******",
+		"secretKey": "******************",
 		"s3Bucket": "synectiks-backup",
 		"s3Region": "eu_west_1",
 		"s3EndPoint": "s3.eu_west_1.amazonaws.com"

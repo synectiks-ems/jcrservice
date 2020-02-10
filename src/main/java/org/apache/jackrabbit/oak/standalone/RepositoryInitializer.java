@@ -57,6 +57,7 @@ import org.springframework.core.io.Resource;
 public class RepositoryInitializer {
 
     public static final String ARG_MONGO = "mongo";
+    public static final String ARG_S3 = "s3";
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Autowired
@@ -123,8 +124,11 @@ public class RepositoryInitializer {
         //Set of properties used to perform property substitution in
         //OSGi configs
         config.put("repo.home", repoHomeDir.getAbsolutePath());
-        config.put("oak.mongo.db", mongoDbName);
-        config.put("oak.mongo.uri", getMongoURI());
+        List<String> mongoOpts = args.getOptionValues(ARG_MONGO);
+        if (mongoOpts != null && !mongoOpts.isEmpty()){
+	        config.put("oak.mongo.db", mongoDbName);
+	        config.put("oak.mongo.uri", getMongoURI());
+        }
 
         //Configures BundleActivator to get notified of
         //OSGi startup and shutdown
@@ -160,7 +164,11 @@ public class RepositoryInitializer {
 
     private List<String> determineConfigFileNamesToCopy() {
         List<String> configNames = Lists.newArrayList();
-        configNames.add("repository-config.json");
+        if (args.containsOption(ARG_S3)) {
+        	configNames.add("s3-repository-config.json");
+        } else {
+        	configNames.add("file-repository-config.json");
+        }
         log.info("App params:");
         for (String key : args.getOptionNames()) {
             log.info(key + ": " + args.getOptionValues(key));
@@ -169,9 +177,12 @@ public class RepositoryInitializer {
         if (args.containsOption(ARG_MONGO)) {
             configNames.add("mongomk-config.json");
             log.info("Using Mongo persistence");
-        } else {
-            configNames.add("segmentmk-config.json");
-        }
+		} else if (args.containsOption(ARG_S3)) {
+			configNames.add("s3-config.json");
+			log.info("Using S3 persistence");
+		} else {
+			configNames.add("segmentmk-config.json");
+		}
         return configNames;
     }
 

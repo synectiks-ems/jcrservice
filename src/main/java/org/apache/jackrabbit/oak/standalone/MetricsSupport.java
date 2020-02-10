@@ -31,13 +31,13 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnClass(MetricRegistry.class)
 public class MetricsSupport {
 
-    @Autowired
-    private PojoServiceRegistry serviceRegistry;
+	@Autowired
+	private PojoServiceRegistry serviceRegistry;
 
-    @Bean
-    public MetricRegistry getMetricsRegistry(){
-        ServiceReference<?> metricRegistry =
-                serviceRegistry.getServiceReference(MetricRegistry.class.getName());
-        return (MetricRegistry) serviceRegistry.getService(metricRegistry);
-    }
+	@Bean
+	public MetricRegistry getMetricsRegistry() {
+		ServiceReference<?> metricRegistry = serviceRegistry
+				.getServiceReference(MetricRegistry.class.getName());
+		return (MetricRegistry) serviceRegistry.getService(metricRegistry);
+	}
 }

@@ -1,0 +1,32 @@
+{
+	"org.apache.felix.jaas.Configuration.factory-GuestLoginModule": {
+		"jaas.controlFlag": "optional",
+		"jaas.classname": "org.apache.jackrabbit.oak.spi.security.authentication.GuestLoginModule",
+		"jaas.ranking": 300
+	},
+	"org.apache.felix.jaas.Configuration.factory-LoginModuleImpl": {
+		"jaas.controlFlag": "required",
+		"jaas.classname": "org.apache.jackrabbit.oak.security.authentication.user.LoginModuleImpl",
+		"jaas.ranking": 100
+	},
+	"org.apache.felix.jaas.Configuration.factory-TokenLoginModule": {
+		"jaas.controlFlag": "sufficient",
+		"jaas.classname": "org.apache.jackrabbit.oak.security.authentication.token.TokenLoginModule",
+		"jaas.ranking": 200
+	},
+	"org.apache.felix.jaas.ConfigurationSpi": {
+		"jaas.defaultRealmName": "jackrabbit.oak",
+		"jaas.globalConfigPolicy": "proxy",
+		"jaas.configProviderName": "FelixJaasProvider"
+	},
+	"org.apache.jackrabbit.oak.jcr.osgi.RepositoryManager": {
+		
+	},
+	"org.apache.jackrabbit.oak.plugins.blob.datastore.S3DataStore": {
+		"accessKey": "AKIAJ5HPZP63M5WPNWVA",
+		"secretKey": "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",
+		"s3Bucket": "synectiks-backup",
+		"s3Region": "eu_west_1",
+		"s3EndPoint": "s3.eu_west_1.amazonaws.com"
+	}
+}

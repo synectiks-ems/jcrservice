@@ -30,14 +30,18 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 public class OakServer {
 
 	private static final Logger logger = LoggerFactory.getLogger(OakServer.class);
-
+	private static ConfigurableApplicationContext ctx = null;
+	
 	public static void main(String[] args) {
-		ConfigurableApplicationContext ctx = SpringApplication.run(OakServer.class, args);
+		ctx = SpringApplication.run(OakServer.class, args);
 		RequestMappingHandlerMapping bean = ctx
 				.getBean(RequestMappingHandlerMapping.class);
 		bean.getHandlerMethods().forEach((key, value) -> {
 			logger.info("Key: " + key);
 			logger.info("Value: " + key);
 		});
+	}
+	public static <T> T getBean(Class<T> cls) {
+		return ctx.getBean(cls);
 	}
 }

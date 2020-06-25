@@ -13,5 +13,14 @@ logging:
     web: TRACE
     org.springframework.web: TRACE
 spring:
-  http:
-    log-request-details: true
+    #http:
+    #    log-request-details: true
+    datasource:
+        url: jdbc:postgresql://localhost:5432/jcr
+        username: postgres
+        password: postgres
+        initialization-mode: always
+        initialize: true
+        continue-on-error: true
+kafka:
+   url: http://localhost:8190/kafka/send 

@@ -4,16 +4,24 @@
 package org.apache.jackrabbit.oak.controllers;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.jackrabbit.oak.OakServer;
 import org.apache.jackrabbit.oak.manager.OakManager;
+import org.apache.jackrabbit.oak.postgs.domain.CloudContextPath;
+import org.apache.jackrabbit.oak.postgs.domain.Documents;
+import org.apache.jackrabbit.oak.postgs.service.CloudContextPathService;
+import org.apache.jackrabbit.oak.postgs.service.DocumentsService;
 import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.synectiks.commons.constants.IConsts;
@@ -43,15 +52,55 @@ public class OakController {
 	@Autowired
 	private OakManager oakRepoManager;
 
+	@Autowired
+	private CloudContextPathService cloudContextPathService;
+	
+	@Autowired
+	DocumentsService documentsService;
+	
+	@Value("${kafka.url}")
+    private String kafkaUrl;
+	
 	/**
 	 * Service API for uploading a file on server for OakFileNode.
-	 * @param file add your uploaded file with 'file' name param
+	 * @param file add your uploaded file with 'file' name param. CMS Plugin/Module name to get the cloud context information. This module name is used as a kafka topic
 	 * @return {@code ResponseEntity} with absolute file path of file on server
 	 */
 	@RequestMapping(value = "/upload")
-	public ResponseEntity<Object> uploadAttachment(@RequestParam String upPath,
+	public ResponseEntity<Object> uploadAttachment(@RequestParam String upPath, @RequestParam String module,
 			@RequestPart MultipartFile file) {
-		return IUtils.saveUploadedFile(file, upPath);
+		logger.info("Saving fle to local server");
+		ResponseEntity<Object> obj = IUtils.saveUploadedFile(file, upPath);
+		sendMessageToKafka(upPath, module, file);
+		return obj;
+	}
+
+	private void sendMessageToKafka(String upPath, String module, MultipartFile file) {
+		logger.info("Sending message to kafka");
+		logger.debug("kafka url : "+kafkaUrl);
+		Documents doc = new Documents();
+		try {
+			Map<String, String> criteriaMap = new HashMap<>();
+			criteriaMap.put("plugin", module);
+			List<CloudContextPath> list = cloudContextPathService.search(criteriaMap);
+			if(list.size() >0) {
+				logger.debug("Cloud context path information found. Sending message to kafka");
+				doc.setFileName(file.getOriginalFilename());
+				doc.setLocalFilePath(upPath);
+				doc.setCloudContextPath(list.get(0));
+				String jsonString = IUtils.OBJECT_MAPPER.writeValueAsString(doc);
+				logger.debug("Json message to kafka : "+jsonString);
+				fireEvent(jsonString, module);
+				doc.setStatus("SUCCESS");
+			}
+		}catch (Throwable ex) {
+			doc.setStatus("PENDING");
+			logger.error("Due to some exception, cloud context message cannot be sent to kafka: ",ex);
+			ex.printStackTrace();
+			logger.error("Exception while converting object into json string. "+ex.getMessage(), IUtils.getFailedResponse(ex));
+		}
+		logger.info("Saving information in documents");
+		documentsService.saveDocuments(doc);
 	}
 
 	/**
@@ -261,4 +310,21 @@ public class OakController {
 		return new ResponseEntity<>(res, HttpStatus.OK);
 	}
 
+	private void fireEvent(String jsonStr, String kafkaTopic) {
+		String PRM_TOPIC = "topic";
+		String PRM_MSG = "msg";
+    	RestTemplate restTemplate = OakServer.getBean(RestTemplate.class);
+    	String res = null;
+		try {
+			res = IUtils.sendGetRestRequest(
+					restTemplate, 
+					kafkaUrl,
+					IUtils.getRestParamMap(PRM_TOPIC, kafkaTopic, PRM_MSG, jsonStr), 
+					String.class);
+			logger.debug("Message sent to kafka. Kafka response : "+res);
+		} catch(Exception ex) {
+			logger.error(ex.getMessage(), ex);
+			res = null;
+		}
+	}
 }

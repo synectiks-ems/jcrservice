@@ -3,6 +3,7 @@
  */
 package org.apache.jackrabbit.oak.controllers;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
@@ -11,11 +12,15 @@ import java.util.Map;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.jackrabbit.oak.OakServer;
 import org.apache.jackrabbit.oak.manager.OakManager;
 import org.apache.jackrabbit.oak.postgs.domain.CloudContextPath;
+import org.apache.jackrabbit.oak.postgs.domain.CloudInfo;
+import org.apache.jackrabbit.oak.postgs.domain.CloudProviderConfig;
 import org.apache.jackrabbit.oak.postgs.domain.Documents;
 import org.apache.jackrabbit.oak.postgs.service.CloudContextPathService;
+import org.apache.jackrabbit.oak.postgs.service.CloudProviderConfigService;
 import org.apache.jackrabbit.oak.postgs.service.DocumentsService;
 import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
@@ -56,6 +61,9 @@ public class OakController {
 	private CloudContextPathService cloudContextPathService;
 	
 	@Autowired
+	private CloudProviderConfigService cloudProviderConfigService;
+	
+	@Autowired
 	DocumentsService documentsService;
 	
 	@Value("${kafka.url}")
@@ -69,40 +77,69 @@ public class OakController {
 	@RequestMapping(value = "/upload")
 	public ResponseEntity<Object> uploadAttachment(@RequestParam String upPath, @RequestParam String module,
 			@RequestPart MultipartFile file) {
-		logger.info("Saving fle to local server");
+		logger.info("Saving file to local server");
 		ResponseEntity<Object> obj = IUtils.saveUploadedFile(file, upPath);
-		sendMessageToKafka(upPath, module, file);
+		logger.info("File saved in local server");
+		Documents doc = saveDocument(upPath, module, file);
+		sendMessageToKafka(doc);
 		return obj;
 	}
 
-	private void sendMessageToKafka(String upPath, String module, MultipartFile file) {
-		logger.info("Sending message to kafka");
-		logger.debug("kafka url : "+kafkaUrl);
-		Documents doc = new Documents();
+	private void sendMessageToKafka(Documents doc) {
+		CloudInfo info = new CloudInfo();
+		
+		try {
+			BeanUtils.copyProperties(info, doc);
+//			info.setFilename(doc.getLocalFilePath()+File.separatorChar+doc.getFileName());
+			info.setLocalFile(doc.getLocalFilePath()+File.separatorChar+doc.getFileName());
+			BeanUtils.copyProperties(info, doc.getCloudContextPath());
+			info.setContextPath(doc.getCloudContextPath().getPath());
+			
+			Map<String, String> criteriaMap = new HashMap<>();
+			criteriaMap.put("provider", doc.getCloudContextPath().getProvider());
+			List<CloudProviderConfig> list = cloudProviderConfigService.search(criteriaMap);
+			if(list.size() > 0) {
+				BeanUtils.copyProperties(info, list.get(0));
+			}
+			
+			logger.info("Converting object to JSON: "+info);
+			String jsonString = IUtils.OBJECT_MAPPER.writeValueAsString(info);
+			logger.debug("Sending json message to kafka : "+jsonString);
+			fireEvent(jsonString);
+			logger.debug("Json message sent to kafka : ");
+		}catch (Throwable ex) {
+			logger.error("Due to some exception, cloud context message cannot be sent to kafka: ",ex);
+			ex.printStackTrace();
+		}
+	}
+
+	private Documents saveDocument(String upPath, String module, MultipartFile file) {
+		logger.info("Saving file information in documents");
+		Documents doc = null;
 		try {
 			Map<String, String> criteriaMap = new HashMap<>();
 			criteriaMap.put("plugin", module);
 			List<CloudContextPath> list = cloudContextPathService.search(criteriaMap);
 			if(list.size() >0) {
-				logger.debug("Cloud context path information found. Sending message to kafka");
+				doc = new Documents();
 				doc.setFileName(file.getOriginalFilename());
 				doc.setLocalFilePath(upPath);
 				doc.setCloudContextPath(list.get(0));
-				String jsonString = IUtils.OBJECT_MAPPER.writeValueAsString(doc);
-				logger.debug("Json message to kafka : "+jsonString);
-				fireEvent(jsonString, module);
 				doc.setStatus("SUCCESS");
+				doc = documentsService.saveDocuments(doc);
 			}
 		}catch (Throwable ex) {
+			doc = new Documents();
+			doc.setFileName(file.getOriginalFilename());
+			doc.setLocalFilePath(upPath);
 			doc.setStatus("PENDING");
-			logger.error("Due to some exception, cloud context message cannot be sent to kafka: ",ex);
+			doc = documentsService.saveDocuments(doc);
+			logger.error("Exception: ",ex);
 			ex.printStackTrace();
-			logger.error("Exception while converting object into json string. "+ex.getMessage(), IUtils.getFailedResponse(ex));
 		}
-		logger.info("Saving information in documents");
-		documentsService.saveDocuments(doc);
+		logger.info("File information saved in documents");
+		return doc;
 	}
-
 	/**
 	 * Api to get the list of child nodes by absolute node path.
 	 * @param path
@@ -310,9 +347,10 @@ public class OakController {
 		return new ResponseEntity<>(res, HttpStatus.OK);
 	}
 
-	private void fireEvent(String jsonStr, String kafkaTopic) {
+	private void fireEvent(String jsonStr) {
 		String PRM_TOPIC = "topic";
 		String PRM_MSG = "msg";
+		String kafkaTopic = "topic.file.upload";
     	RestTemplate restTemplate = OakServer.getBean(RestTemplate.class);
     	String res = null;
 		try {
